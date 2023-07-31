@@ -12,7 +12,10 @@ from bs4 import BeautifulSoup
 from mastodon import Mastodon
 from datetime import datetime, timezone, MINYEAR
 
-DEFAULT_CONFIG_FILE = os.path.join("~", "apps", "workspace", "config_file")
+print(f"Current directory: {os.getcwd()}")
+
+# DEFAULT_CONFIG_FILE = os.path.join("~", "apps", "workspace", "config_file")
+DEFAULT_CONFIG_FILE = "config_file"
 
 def main():
     parser = argparse.ArgumentParser()
