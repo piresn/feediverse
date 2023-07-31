@@ -12,7 +12,10 @@ from bs4 import BeautifulSoup
 from mastodon import Mastodon
 from datetime import datetime, timezone, MINYEAR
 
-DEFAULT_CONFIG_FILE = os.path.join("~", ".feediverse")
+print(f"Current directory: {os.getcwd()}")
+
+# DEFAULT_CONFIG_FILE = os.path.join("~", "apps", "workspace", "config_file")
+DEFAULT_CONFIG_FILE = "config_file"
 
 def main():
     parser = argparse.ArgumentParser()
@@ -31,16 +34,13 @@ def main():
     if args.verbose:
         print("using config file", config_file)
 
-    if not os.path.isfile(config_file):
-        setup(config_file)        
-
     config = read_config(config_file)
 
     masto = Mastodon(
-        api_base_url=config['url'],
-        client_id=config['client_id'],
-        client_secret=config['client_secret'],
-        access_token=config['access_token']
+        api_base_url=os.environ['URL'],
+        client_id=os.environ['client_key'],
+        client_secret=os.environ['client_secret'],
+        access_token=os.environ['access_token']
     )
 
     newest_post = config['updated']
@@ -114,10 +114,6 @@ def find_urls(html):
             urls.append(url)
     return urls
 
-def yes_no(question):
-    res = input(question + ' [y/n] ')
-    return res.lower() in "y1"
-
 def save_config(config, config_file):
     copy = dict(config)
     with open(config_file, 'w') as fh:
@@ -133,49 +129,6 @@ def read_config(config_file):
             cfg['updated'] = dateutil.parser.parse(cfg['updated'])
     config.update(cfg)
     return config
-
-def setup(config_file):
-    url = input('What is your Mastodon Instance URL? ')
-    have_app = yes_no('Do you have your app credentials already?')
-    if have_app:
-        name = 'feediverse'
-        client_id = input('What is your app\'s client id: ')
-        client_secret = input('What is your client secret: ')
-        access_token = input('access_token: ')
-    else:
-        print("Ok, I'll need a few things in order to get your access token")
-        name = input('app name (e.g. feediverse): ') 
-        client_id, client_secret = Mastodon.create_app(
-            api_base_url=url,
-            client_name=name,
-            #scopes=['read', 'write'],
-            website='https://github.com/edsu/feediverse'
-        )
-        username = input('mastodon username (email): ')
-        password = input('mastodon password (not stored): ')
-        m = Mastodon(client_id=client_id, client_secret=client_secret, api_base_url=url)
-        access_token = m.log_in(username, password)
-
-    feed_url = input('RSS/Atom feed URL to watch: ')
-    old_posts = yes_no('Shall already existing entries be tooted, too?')
-    config = {
-        'name': name,
-        'url': url,
-        'client_id': client_id,
-        'client_secret': client_secret,
-        'access_token': access_token,
-        'feeds': [
-            {'url': feed_url, 'template': '{title} {url}'}
-        ]
-    }
-    if not old_posts:
-        config['updated'] = datetime.now(tz=timezone.utc).isoformat()
-    save_config(config, config_file)
-    print("")
-    print("Your feediverse configuration has been saved to {}".format(config_file))
-    print("Add a line line this to your crontab to check every 15 minutes:")
-    print("*/15 * * * * /usr/local/bin/feediverse")
-    print("")
 
 if __name__ == "__main__":
     main()

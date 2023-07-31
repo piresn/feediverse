@@ -1,0 +1,8 @@
+name: DigitalOcean App Platform deployment
+on: 
+  schedule:
+    cron: "*/5 * * * *"
+  uses: digitalocean/app_action@v1.1.5
+  with:
+    app_name: ${{ secrets.DIGITALOCEAN_APP_NAME }}
+    token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
