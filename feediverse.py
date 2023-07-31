@@ -135,7 +135,7 @@ def read_config(config_file):
     return config
 
 def setup(config_file):
-    url = input('What is your Mastodon Instance URL? ')
+    url = input('What is your Mastodon Instance URL?')
     have_app = yes_no('Do you have your app credentials already?')
     if have_app:
         name = 'feediverse'
