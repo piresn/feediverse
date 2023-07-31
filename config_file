@@ -1,0 +1,4 @@
+feeds:
+- template: '{title} {url}'
+  url: https://feeds.feedburner.com/PublicoRSS
+updated: '2023-07-31T18:35:41+00:00'
